@@ -82,7 +82,9 @@ var AkadokMaster = function() {
 	 */
 	self.initializeServer = function() {
 		var app = express();
-
+		app.use(express.json());
+		app.use(express.urlencoded());
+		
 		// Main route to get server list
 		app.get('/', function(req, res) {
 
