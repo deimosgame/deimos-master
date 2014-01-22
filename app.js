@@ -75,7 +75,7 @@ var AkadokMaster = function() {
 
 	/**
 	 *  Scheduled task allowing to remove idle/closed servers automatically
-	 *  - is executed every 10 seconds
+	 *  - is executed every 5 seconds
 	 */
 	self.initScheduledTask = function() {
 		setInterval(function() {
@@ -87,7 +87,7 @@ var AkadokMaster = function() {
 						server.ip, server.port, server.name);
 				}
 			}
-		}, 10000);
+		}, 5000);
 	};
 
 	/*  ================================================================  */
