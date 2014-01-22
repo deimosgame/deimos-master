@@ -150,8 +150,8 @@ var AkadokMaster = function() {
 			}
 			// In case of a new server
 			if (!serverEdited) {
-				winston.info('Server %s:%d joined server list',
-					server.ip, server.port);
+				winston.info('Server %s:%d (%s) joined server list',
+					server.ip, server.port, server.name);
 				self.servers.push(server);
 			}
 			// Changes are saved
