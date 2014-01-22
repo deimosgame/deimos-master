@@ -93,6 +93,11 @@ var AkadokMaster = function() {
 
 		});
 
+		// Route for manually unregistering servers
+		app.delete('/', function(req, res) {
+
+		});
+
 		self.app = app;
 	};
 
