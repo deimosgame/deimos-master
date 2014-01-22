@@ -87,7 +87,20 @@ var AkadokMaster = function() {
 		
 		// Main route to get server list
 		app.get('/', function(req, res) {
-
+			self.servers = [
+				{
+					ip: '127.0.0.1',
+					port: 1234,
+					name: 'My little server',
+					map: 'coolmap',
+					players: [
+						'Artemis',
+						'Mandordu53_1995',
+						'Cyril',
+						'Vomusseind'
+					]
+				}];
+			res.status(200).json(self.servers);
 		});
 
 		/**
