@@ -99,12 +99,46 @@ var AkadokMaster = function() {
 		 *	(same route for registration and heartbeat)
 		 */
 		app.post('/', function(req, res) {
-
-		});
-
-		// Route for manually unregistering servers
-		app.delete('/', function(req, res) {
-
+			var server = {
+				ip: req.ip,
+				port: parseInt(req.body.port),
+				name: req.body.name,
+				map: req.body.map,
+				players: req.body.players,
+				lastRefresh: timestamp()
+			}
+			// Some validation to prevent errors
+			if (typeof server.port !== 'number' || !(server.port > 0)) {
+				res.json(400, { error: 'Bad request' });
+				return;
+			}
+			if (typeof server.players === 'undefined') {
+				res.json(400, { error: 'Bad request' });
+				return;
+			}
+			// Final cleanup of players
+			server.players = server.players.split(',');
+			server.players = server.players.map(function (currentPlayer) {
+				return currentPlayer.trim();
+			});
+			// Check if the server is created or updated
+			var serverEdited = false;
+			for (var i = 0; i < self.servers.length; i++) {
+				if (self.servers[i].ip === server.ip &&
+					self.servers[i].port === server.port) {
+					self.servers[i] = server;
+					serverEdited = true;
+					break;
+				}
+			}
+			// In case of a new server
+			if (!serverEdited) {
+				winston.info('Server %s:%d joined server list',
+					server.ip, server.port);
+				self.servers.push(server);
+			}
+			// Changes are saved
+			res.json(200, { success: true });
 		});
 
 		self.app = app;
