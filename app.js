@@ -74,22 +74,27 @@ var AkadokMaster = function() {
 	};
 
 	/**
+	 *  Removes servers idle for more than 20 seconds
+	 */
+	self.removeIdleServers = function() {
+		var currentTimestamp = timestamp();
+		for (var i = 0; i < self.servers.length; i++) {
+			var server = self.servers[i];
+			if (currentTimestamp - server.lastRefresh > 20) {
+				// Remove the server from servers array
+				self.servers.splice(i, 1);
+				winston.info('Removed idle server %s:%d (%s)',
+					server.ip, server.port, server.name);
+			}
+		}
+	};
+
+	/**
 	 *  Scheduled task allowing to remove idle/closed servers automatically
 	 *  - is executed every 5 seconds
 	 */
 	self.initScheduledTask = function() {
-		setInterval(function() {
-			var currentTimestamp = timestamp();
-			for (var i = 0; i < self.servers.length; i++) {
-				var server = self.servers[i];
-				if (currentTimestamp - server.lastRefresh > 20) {
-					// Remove the server from servers array
-					self.servers.splice(i, 1);
-					winston.info('Removed idle server %s:%d (%s)',
-						server.ip, server.port, server.name);
-				}
-			}
-		}, 5000);
+		setInterval(self.removeIdleServers, 5000);
 	};
 
 	/*  ================================================================  */
