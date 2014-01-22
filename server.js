@@ -177,3 +177,11 @@ var AkadokMaster = function() {
 var akadok = new AkadokMaster();
 akadok.initialize();
 akadok.start();
+
+
+/**
+ *  Some more useful functions
+ */
+var timestamp = function() {
+	return Math.round(new Date().getTime() / 1000);
+};
