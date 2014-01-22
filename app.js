@@ -124,6 +124,7 @@ var AkadokMaster = function() {
 				name: req.body.name,
 				map: req.body.map,
 				players: req.body.players,
+				maxplayers: parseInt(req.body.maxplayers),
 				lastRefresh: timestamp()
 			}
 			// Some validation to prevent errors
@@ -132,6 +133,10 @@ var AkadokMaster = function() {
 				return;
 			}
 			if (typeof server.players === 'undefined') {
+				res.json(400, { error: 'Bad request' });
+				return;
+			}
+			if (typeof server.maxplayers !== 'number' || !(server.maxplayers > 0)) {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
