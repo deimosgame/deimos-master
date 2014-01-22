@@ -30,6 +30,9 @@ var AkadokMaster = function() {
 			winston.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
 			self.ipaddress = "127.0.0.1";
 		};
+
+		// Setup an empty list of game servers
+		self.servers = [];
 	};
 
 
