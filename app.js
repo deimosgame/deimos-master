@@ -73,6 +73,23 @@ var AkadokMaster = function() {
 		});
 	};
 
+	/**
+	 *  Scheduled task allowing to remove idle/closed servers automatically
+	 *  - is executed every 10 seconds
+	 */
+	self.initScheduledTask = function() {
+		setInterval(function() {
+			var currentTimestamp = timestamp();
+			for (var i = 0; i < self.servers.length; i++) {
+				var server = self.servers[i];
+				if (currentTimestamp - server.lastRefresh > 15) {
+					winston.info('Removed idle server %s:%d (%s)',
+						server.ip, server.port, server.name);
+				}
+			}
+		}, 10000);
+	};
+
 	/*  ================================================================  */
 	/*  App server functions											  */
 	/*  ================================================================  */
