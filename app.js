@@ -82,7 +82,7 @@ var AkadokMaster = function() {
 			var currentTimestamp = timestamp();
 			for (var i = 0; i < self.servers.length; i++) {
 				var server = self.servers[i];
-				if (currentTimestamp - server.lastRefresh > 15) {
+				if (currentTimestamp - server.lastRefresh > 20) {
 					// Remove the server from servers array
 					self.servers.splice(i, 1);
 					winston.info('Removed idle server %s:%d (%s)',
