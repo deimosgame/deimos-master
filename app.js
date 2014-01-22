@@ -168,6 +168,7 @@ var AkadokMaster = function() {
 		// Misc initialization
 		self.initLogging();
 		self.setupVariables();
+		self.initScheduledTask();
 		self.setupTerminationHandlers();
 
 		// Create the express server and routes.
