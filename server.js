@@ -4,7 +4,7 @@ var winston = require('winston');
 
 
 /**
- *  Define the sample application.
+ *  Main AkadokMaster class
  */
 var AkadokMaster = function() {
 
@@ -24,11 +24,11 @@ var AkadokMaster = function() {
 		self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
 		self.port	   = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
-		if (typeof self.ipaddress === "undefined") {
+		if (typeof self.ipaddress === 'undefined') {
 			// Log errors on OpenShift but continue w/ 127.0.0.1 - this
 			// allows us to run/test the app locally.
 			winston.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
-			self.ipaddress = "127.0.0.1";
+			self.ipaddress = '127.0.0.1';
 		};
 
 		// Setup an empty list of game servers
@@ -42,7 +42,7 @@ var AkadokMaster = function() {
 	 *  @param {string} sig  Signal to terminate on.
 	 */
 	self.terminator = function(sig) {
-		if (typeof sig === "string") {
+		if (typeof sig === 'string') {
 		   winston.info('Received %s - master server is going down...', sig);
 		   process.exit(1);
 		}
