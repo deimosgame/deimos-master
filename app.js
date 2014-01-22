@@ -43,7 +43,7 @@ var AkadokMaster = function() {
 	 */
 	self.terminator = function(sig) {
 		if (typeof sig === 'string') {
-		   winston.info('Received %s - master server is going down...', sig);
+		   winston.info('Received %s - master server is going down.', sig);
 		   process.exit(1);
 		}
 		winston.info('Master server stopped.');
@@ -182,7 +182,7 @@ var AkadokMaster = function() {
 	self.start = function() {
 		//  Start the app on the specific interface (and port).
 		self.app.listen(self.port, self.ipaddress, function() {
-			winston.info('Akadok master server started on %s:%d...',
+			winston.info('Akadok master server started on %s:%d.',
 				self.ipaddress, self.port);
 		});
 	};
