@@ -119,6 +119,16 @@ var AkadokMaster = function() {
 			res.json(200, self.servers);
 		});
 
+		// Route used to get client's IP
+		app.get('/ip', function(req, res) {
+			if (config.verbose)
+				winston.info('Request for IP from %s', req.ip);
+			res.json(200, {
+				success: true,
+				ip: req.ip
+			});
+		});
+
 		/**
 		 *	Route used by servers to signal themselves
 		 *	(same route for registration and heartbeat)
