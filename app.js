@@ -1,7 +1,7 @@
 #!/bin/env node
 var express = require('express');
 var winston = require('winston');
-
+var config	= require('./config.json');
 
 /**
  *  Main AkadokMaster class
@@ -22,7 +22,7 @@ var AkadokMaster = function() {
 	self.setupVariables = function() {
 		// Set the environment variables we need.
 		self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-		self.port	   = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+		self.port	   = process.env.OPENSHIFT_NODEJS_PORT || config.alternative_port;
 
 		if (typeof self.ipaddress === 'undefined') {
 			// Log errors on OpenShift but continue w/ 127.0.0.1 - this
@@ -69,7 +69,7 @@ var AkadokMaster = function() {
 	self.initLogging = function() {
 		// We enable file logging
 		winston.add(winston.transports.File, {
-			filename: 'server.log'
+			filename: config.log_file
 		});
 	};
 
@@ -82,11 +82,11 @@ var AkadokMaster = function() {
 			if (!self.servers.hasOwnProperty(currentServer))
 				continue;
 			var server = self.servers[currentServer];
-			if (currentTimestamp - server.lastRefresh > 20) {
+			if (currentTimestamp - server.lastRefresh > config.max_idle_time) {
 				// Remove the server from servers object
 				delete self.servers[currentServer];
-				winston.info('Removed idle server %s:%d (%s)',
-					server.ip, server.port, server.name);
+				winston.info('Removed idle server %s (%s)',
+					currentServer, server.name);
 			}
 		}
 	};
@@ -96,7 +96,7 @@ var AkadokMaster = function() {
 	 *  - is executed every 5 seconds
 	 */
 	self.initScheduledTask = function() {
-		setInterval(self.removeIdleServers, 5000);
+		setInterval(self.removeIdleServers, config.idle_check_frequency * 1000);
 	};
 
 	/*  ================================================================  */
@@ -112,6 +112,8 @@ var AkadokMaster = function() {
 
 		// Main route to get server list
 		app.get('/', function(req, res) {
+			if (config.verbose)
+				winston.info('Request from %s for server list', req.ip);
 			res.json(200, self.servers);
 		});
 
@@ -149,8 +151,12 @@ var AkadokMaster = function() {
 			});
 			// Check if the server is created or updated
 			var serverKey = server.ip + ':' + server.port;
-			if (self.servers.hasOwnProperty(serverKey))
+			if (self.servers.hasOwnProperty(serverKey)) {
+				if (config.verbose)
+					winston.info('Received heartbeat from %s (%s)',
+						serverKey, server.name);
 				self.servers[serverKey] = server;
+			}
 			else {
 				winston.info('Server %s:%d (%s) joined server list',
 					server.ip, server.port, server.name);
