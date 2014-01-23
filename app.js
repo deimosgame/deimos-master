@@ -27,7 +27,7 @@ var AkadokMaster = function() {
 		if (typeof self.ipaddress === 'undefined') {
 			// Log errors on OpenShift but continue w/ 127.0.0.1 - this
 			// allows us to run/test the app locally.
-			winston.warn('Environement not supported (run on OpenShift!)');
+			winston.warn('Environement not supported (not running on OpenShift)');
 			self.ipaddress = '127.0.0.1';
 		};
 
@@ -110,7 +110,7 @@ var AkadokMaster = function() {
 	 */
 	self.initializeServer = function() {
 		var app = express();
-		app.use(express.multipart());
+		app.use(express.json());
 
 		// Main route to get server list
 		app.get('/', function(req, res) {
