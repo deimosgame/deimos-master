@@ -1,12 +1,7 @@
 {
-	// Alternative port if OpenShift env variables are not defined
 	"alternative_port": 8080,
-	// Log file name
 	"log_file": "server.log",
-	// Verbose mode
 	"verbose": true,
-	// Idle delay before removal (seconds)
 	"max_idle_time": 20,
-	// How often check for idle servers (seconds)
 	"idle_check_frequency": 5
 }
