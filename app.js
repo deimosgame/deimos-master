@@ -148,17 +148,9 @@ var AkadokMaster = function() {
 				return currentPlayer.trim();
 			});
 			// Check if the server is created or updated
-			var serverEdited = false;
-			for (var currentServer in self.servers) {
-				if (self.servers[currentServer].ip === server.ip &&
-					self.servers[currentServer].port === server.port) {
-					self.servers[currentServer] = server;
-					serverEdited = true;
-					break;
-				}
-			}
-			// In case of a new server
-			if (!serverEdited) {
+			if (self.servers.hasOwnProperty(server.ip + ':' + server.port))
+				self.servers[currentServer] = server;
+			else {
 				winston.info('Server %s:%d (%s) joined server list',
 					server.ip, server.port, server.name);
 				self.servers[server.ip + ':' + server.port];
