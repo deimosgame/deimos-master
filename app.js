@@ -112,11 +112,6 @@ var AkadokMaster = function() {
 
 		// Main route to get server list
 		app.get('/', function(req, res) {
-			// Small cleanup of the list
-			var cleanedArray = self.servers.map(function (currentServer) {
-				delete currentServer.lastRefresh;
-				return currentServer;
-			});
 			res.json(200, self.servers);
 		});
 
