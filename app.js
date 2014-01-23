@@ -148,12 +148,13 @@ var AkadokMaster = function() {
 				return currentPlayer.trim();
 			});
 			// Check if the server is created or updated
-			if (self.servers.hasOwnProperty(server.ip + ':' + server.port))
-				self.servers[currentServer] = server;
+			var serverKey = server.ip + ':' + server.port;
+			if (self.servers.hasOwnProperty(serverKey))
+				self.servers[serverKey] = server;
 			else {
 				winston.info('Server %s:%d (%s) joined server list',
 					server.ip, server.port, server.name);
-				self.servers[server.ip + ':' + server.port];
+				self.servers[serverKey] = server;
 			}
 			// Changes are saved
 			res.json(200, { success: true });
