@@ -71,6 +71,8 @@ var AkadokMaster = function() {
 		winston.add(winston.transports.File, {
 			filename: config.log_file
 		});
+		if (config.verbose)
+			winston.info('Verbose mode is ENABLED');
 	};
 
 	/**
