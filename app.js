@@ -138,7 +138,8 @@ var AkadokMaster = function() {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
-			if (typeof server.players === 'undefined') {
+			if (server.players !== '' && 
+				typeof server.players === 'undefined') {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
