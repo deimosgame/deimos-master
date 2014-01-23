@@ -32,7 +32,7 @@ var AkadokMaster = function() {
 		};
 
 		// Setup an empty list of game servers
-		self.servers = [];
+		self.servers = {};
 	};
 
 
@@ -78,11 +78,13 @@ var AkadokMaster = function() {
 	 */
 	self.removeIdleServers = function() {
 		var currentTimestamp = timestamp();
-		for (var i = 0; i < self.servers.length; i++) {
-			var server = self.servers[i];
+		for (var currentServer in self.servers) {
+			if (!self.servers.hasOwnProperty(currentServer))
+				continue;
+			var server = self.servers[currentServer];
 			if (currentTimestamp - server.lastRefresh > 20) {
 				// Remove the server from servers array
-				self.servers.splice(i, 1);
+				delete self.servers[server];
 				winston.info('Removed idle server %s:%d (%s)',
 					server.ip, server.port, server.name);
 			}
@@ -152,10 +154,10 @@ var AkadokMaster = function() {
 			});
 			// Check if the server is created or updated
 			var serverEdited = false;
-			for (var i = 0; i < self.servers.length; i++) {
-				if (self.servers[i].ip === server.ip &&
-					self.servers[i].port === server.port) {
-					self.servers[i] = server;
+			for (var currentServer in self.servers) {
+				if (self.servers[currentServer].ip === server.ip &&
+					self.servers[currentServer].port === server.port) {
+					self.servers[currentServer] = server;
 					serverEdited = true;
 					break;
 				}
@@ -164,7 +166,7 @@ var AkadokMaster = function() {
 			if (!serverEdited) {
 				winston.info('Server %s:%d (%s) joined server list',
 					server.ip, server.port, server.name);
-				self.servers.push(server);
+				self.servers[server.ip + ':' + server.port];
 			}
 			// Changes are saved
 			res.json(200, { success: true });
