@@ -118,17 +118,19 @@ var AkadokMaster = function() {
 		// Main route to get server list
 		app.get('/', function(req, res) {
 			if (config.verbose)
-				winston.info('Request from %s for server list', req.ip);
+				winston.info('Request from %s for server list',
+					req.connection.remoteAddress);
 			res.json(200, self.servers);
 		});
 
 		// Route used to get client's external IP
 		app.get('/ip', function(req, res) {
 			if (config.verbose)
-				winston.info('Request for IP from %s', req.ip);
+				winston.info('Request for IP from %s',
+					req.connection.remoteAddress);
 			res.json(200, {
 				success: true,
-				ip: req.ip
+				ip: req.connection.remoteAddress
 			});
 		});
 
@@ -138,7 +140,7 @@ var AkadokMaster = function() {
 		 */
 		app.post('/', function(req, res) {
 			var server = {
-				ip: req.ip,
+				ip: req.connection.remoteAddress,
 				port: parseInt(req.body.port),
 				name: req.body.name,
 				map: req.body.map,
@@ -156,7 +158,8 @@ var AkadokMaster = function() {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
-			if (typeof server.maxplayers !== 'number' || !(server.maxplayers > 0)) {
+			if (typeof server.maxplayers !== 'number' ||
+				!(server.maxplayers > 0)) {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
