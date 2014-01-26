@@ -1,4 +1,7 @@
 #!/bin/env node
+// New Relic agent
+require('newrelic');
+// Common dependencies
 var express = require('express');
 var winston = require('winston');
 var config	= require('./config.json');
