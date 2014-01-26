@@ -119,7 +119,7 @@ var AkadokMaster = function() {
 		app.get('/', function(req, res) {
 			if (config.verbose)
 				winston.info('Request from %s for server list',
-					req.connection.remoteAddress);
+					req.realIp());
 			res.json(200, self.servers);
 		});
 
@@ -127,10 +127,10 @@ var AkadokMaster = function() {
 		app.get('/ip', function(req, res) {
 			if (config.verbose)
 				winston.info('Request for IP from %s',
-					req.connection.remoteAddress);
+					req.realIp());
 			res.json(200, {
 				success: true,
-				ip: req.connection.remoteAddress
+				ip: req.realIp()
 			});
 		});
 
@@ -140,7 +140,7 @@ var AkadokMaster = function() {
 		 */
 		app.post('/', function(req, res) {
 			var server = {
-				ip: req.connection.remoteAddress,
+				ip: req.realIp(),
 				port: parseInt(req.body.port),
 				name: req.body.name,
 				map: req.body.map,
@@ -227,6 +227,27 @@ akadok.start();
 /**
  *  Some more useful functions
  */
+
+// Gets the current timestamp
 var timestamp = function() {
 	return Math.round(new Date().getTime() / 1000);
+};
+
+
+// Gets the real ip of a client, bypassing OpenShift proxies
+express.request.__proto__.realIp = function() {
+	var headers = [
+		'X-Forwarded-For',
+		'Proxy-Client-IP',
+		'WL-Proxy-Client-IP',
+		'HTTP_CLIENT_IP',
+		'HTTP_X_FORWARDED_FOR'];
+	for (var i = 0; i < headers.length; i++) {
+		var ip = this.get(headers[i]);
+		if (typeof ip !== 'undefined' &&
+			ip.length !== 0 &&
+			ip.toLowerCase() !== 'unknown')
+			return ip;
+	}
+	return this.ip;
 };
