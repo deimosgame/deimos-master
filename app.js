@@ -24,16 +24,8 @@ var AkadokMaster = function() {
 	 */
 	self.setupVariables = function() {
 		// Set the environment variables we need.
-		self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-		self.port	   = process.env.OPENSHIFT_NODEJS_PORT || config.alternative_port;
-
-		if (typeof self.ipaddress === 'undefined') {
-			// Log errors on OpenShift but continue w/ 127.0.0.1 - this
-			// allows us to run/test the app locally.
-			winston.warn('Environement not supported (not running on OpenShift)');
-			self.ipaddress = '127.0.0.1';
-		};
-
+		self.ipaddress = '127.0.0.1';
+		self.port	   = 1518;
 		// Setup an empty list of game servers
 		self.servers = {};
 	};
