@@ -1,6 +1,8 @@
 #!/bin/env node
 // New Relic agent
 require('newrelic');
+// Heapdump snapshots
+require('heapdump');
 // Common dependencies
 var express = require('express');
 var winston = require('winston');
@@ -11,7 +13,7 @@ var config	= require('./config.json');
  */
 var AkadokMaster = function() {
 
-	//  Scope
+	// Scope
 	var self = this;
 
 
