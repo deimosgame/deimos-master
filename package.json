@@ -5,25 +5,25 @@
   "author": {
     "name": "Louis-Paul - Artemis - Dareau",
     "email": "dareau_l@epita.fr",
-    "url": "http://www.openshift.com/"
+    "url": "http://www.deimos-ga.me/"
   },
-  "homepage": "http://www.openshift.com/",
+  "homepage": "http://www.deimos-ga.me/",
   "repository": {
     "type": "git",
-    "url": "https://www.bitbucket.org/artemis2/akadok-master"
+    "url": "https://www.bitbucket.org/deimosgame/akadok-master"
   },
   "engines": {
-    "node": ">= 0.6.0",
+    "node": ">= 0.8.0",
     "npm": ">= 1.0.0"
   },
   "dependencies": {
     "express": "~3.4.8",
     "winston": "~0.7.2",
-    "newrelic": "~1.3.0"
+    "newrelic": "~1.3.0",
+    "heapdump": "~0.2.5"
   },
   "devDependencies": {},
   "bundleDependencies": [],
-
   "private": true,
   "main": "app.js"
 }
