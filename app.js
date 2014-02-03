@@ -54,7 +54,7 @@ var AkadokMaster = function() {
 		//  Process on exit and signals.
 		process.on('exit', function() { self.terminator(); });
 		['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-		 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+		 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGTERM'
 		].forEach(function(element, index, array) {
 			process.on(element, function() { self.terminator(element); });
 		});
