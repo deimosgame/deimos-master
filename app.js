@@ -43,8 +43,10 @@ var AkadokMaster = function() {
 	 */
 	self.terminator = function(sig) {
 		if (typeof sig === 'string') {
-		   winston.info('Received %s - master server is going down.', sig);
-		   process.exit(1);
+			winston.info('Received %s - master server is going down.', sig);
+			if (self.db !== null)
+				self.disconnectDb();
+			process.exit(1);
 		}
 		winston.info('Master server stopped.');
 	};
@@ -89,10 +91,10 @@ var AkadokMaster = function() {
 			password : config.db.password
 		});
 		self.db.connect(function(err) {
-			console.log(err);
-			if (typeof err !== 'undefined') {
+			if (err) {
 				winston.error('Database connection error! Check your credentials and your host!');
 				winston.error('Error details %s: %s', err.fatal ? '(fatal)' : '', err.code);
+				self.db = null;
 				self.terminator('ERROR');
 				return;
 			}
