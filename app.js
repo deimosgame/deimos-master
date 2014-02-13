@@ -2,7 +2,7 @@
 // New Relic agent
 require('newrelic');
 // Heapdump snapshots
-require('heapdump');
+// require('heapdump');
 // Common dependencies
 var express = require('express');
 var winston = require('winston');
@@ -51,7 +51,7 @@ var AkadokMaster = function() {
 	 *  Setup termination handlers (for exit and a list of signals).
 	 */
 	self.setupTerminationHandlers = function() {
-		//  Process on exit and signals.
+		// Process on exit and signals.
 		process.on('exit', function() { self.terminator(); });
 		['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
 		 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGTERM'
