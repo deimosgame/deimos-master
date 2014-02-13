@@ -7,6 +7,7 @@
 	"db": {
 		"host": "127.0.0.1",
 		"user": "root",
-		"password": "cWgT6O76Q5vg7iV653bEm90Q83b142jc"
+		"password": "cWgT6O76Q5vg7iV653bEm90Q83b142jc",
+		"database": "akadok"
 	}
 }

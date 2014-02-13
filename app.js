@@ -88,7 +88,8 @@ var AkadokMaster = function() {
 		self.db = mysql.createConnection({
 			host	 : config.db.host,
 			user	 : config.db.user,
-			password : config.db.password
+			password : config.db.password,
+			database : config.db.Database
 		});
 		self.db.connect(function(err) {
 			if (err) {
