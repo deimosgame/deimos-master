@@ -89,6 +89,7 @@ var AkadokMaster = function() {
 			password : config.db.password
 		});
 		self.db.connect(function(err) {
+			console.log(err);
 			if (typeof err !== 'undefined') {
 				winston.error('Database connection error! Check your credentials and your host!');
 				winston.error('Error details %s: %s', err.fatal ? '(fatal)' : '', err.code);
