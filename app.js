@@ -5,6 +5,7 @@ require('newrelic');
 // require('heapdump');
 // Common dependencies
 var express = require('express');
+var mysql	= require('mysql');
 var winston = require('winston');
 var config	= require('./config.json');
 
@@ -18,7 +19,7 @@ var AkadokMaster = function() {
 
 
 	/*  ================================================================  */
-	/*  Helper functions.												 */
+	/*  Helper functions for server initialization						  */
 	/*  ================================================================  */
 
 	/**
@@ -28,6 +29,8 @@ var AkadokMaster = function() {
 		// Set the environment variables we need.
 		self.ipaddress = '127.0.0.1';
 		self.port	   = 1518;
+		// Database config
+		self.db			= null;
 		// Setup an empty list of game servers
 		self.servers = {};
 	};
@@ -56,9 +59,12 @@ var AkadokMaster = function() {
 		['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
 		 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGTERM'
 		].forEach(function(element, index, array) {
-			process.on(element, function() { self.terminator(element); });
+			process.on(element, function() {
+				self.terminator(element);
+			});
 		});
 	};
+
 
 	/**
 	 *	Winston logging initialization
@@ -71,6 +77,44 @@ var AkadokMaster = function() {
 		if (config.verbose)
 			winston.info('Verbose mode is ENABLED');
 	};
+
+
+	/**
+	 *	MySQL database connection
+	 */
+	self.connectDb = function() {
+		self.db = mysql.createConnection({
+			host	 : config.db.dbHost,
+			user	 : config.db.dbUser,
+			password : config.db.dbPassword
+		});
+		self.db.connect(function(err) {
+			if (typeof err !== 'undefined') {
+				winston.error('Database connection error! Check your credentials and your host!');
+				self.terminator('ERROR');
+				return;
+			}
+			if (config.verbose)
+				winston.info('Connected to database successfully');
+		});
+
+	};
+
+
+	/**
+	 *	MySQL database disconnection
+	 */
+	self.disconnectDb = function() {
+		self.db.end();
+		if (config.verbose)
+			winston.info('Connection to MySQL dropped');
+	};
+
+
+	/*	==================================================================	*/
+	/*	Helper functions													*/
+	/*	==================================================================	*/
+
 
 	/**
 	 *  Removes servers idle for more than 20 seconds
@@ -189,6 +233,7 @@ var AkadokMaster = function() {
 		// Misc initialization
 		self.initLogging();
 		self.setupVariables();
+		self.connectDb();
 		self.initScheduledTask();
 		self.setupTerminationHandlers();
 

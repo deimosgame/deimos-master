@@ -3,5 +3,10 @@
 	"log_file": "server.log",
 	"verbose": true,
 	"max_idle_time": 20,
-	"idle_check_frequency": 5
+	"idle_check_frequency": 5,
+	"db": {
+		"host": "127.0.0.1",
+		"user": "root",
+		"password": "cWgT6O76Q5vg7iV653bEm90Q83b142jc"
+	}
 }
