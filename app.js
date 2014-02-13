@@ -84,15 +84,14 @@ var AkadokMaster = function() {
 	 */
 	self.connectDb = function() {
 		self.db = mysql.createConnection({
-			host	 : config.db.dbHost,
-			user	 : config.db.dbUser,
-			password : config.db.dbPassword
+			host	 : config.db.host,
+			user	 : config.db.user,
+			password : config.db.password
 		});
 		self.db.connect(function(err) {
 			if (typeof err !== 'undefined') {
 				winston.error('Database connection error! Check your credentials and your host!');
-				winston.info(err.code);
-				winston.info(err.fatal);
+				winston.error('Error details %s: %s', err.fatal ? '(fatal)' : '', err.code);
 				self.terminator('ERROR');
 				return;
 			}
