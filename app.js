@@ -30,9 +30,8 @@ var AkadokMaster = function() {
 		self.ipaddress = '127.0.0.1';
 		self.port	   = 1518;
 		// Database config
-		self.db			= null;
-		// Setup an empty list of game servers
-		self.servers = {};
+		self.db = null;
+		self.dbLost = false;
 	};
 
 
@@ -80,6 +79,9 @@ var AkadokMaster = function() {
 			winston.info('Verbose mode is ENABLED');
 	};
 
+	/*	==================================================================	*/
+	/*	Database related helper functions									*/
+	/*	==================================================================	*/
 
 	/**
 	 *	MySQL database connection
@@ -89,7 +91,7 @@ var AkadokMaster = function() {
 			host	 : config.db.host,
 			user	 : config.db.user,
 			password : config.db.password,
-			database : config.db.Database
+			database : config.db.database
 		});
 		self.db.connect(function(err) {
 			if (err) {
@@ -102,7 +104,6 @@ var AkadokMaster = function() {
 			if (config.verbose)
 				winston.info('Connected to database successfully');
 		});
-
 	};
 
 
@@ -113,6 +114,25 @@ var AkadokMaster = function() {
 		self.db.end();
 		if (config.verbose)
 			winston.info('Connection to MySQL dropped');
+	};
+
+
+	/**
+	 *	MySQL error handling
+	 */
+	self.parseDbErrors = function(err) {
+		if (!err) {
+			if (self.dbLost) {
+				self.dbLost = false;
+				winston.info('Regained connexion to database!');
+			}
+			return true;
+		}
+		if (err && (!self.dbLost || config.verbose)) {
+			self.dbLost = true;
+			winston.error('Lost connection to database!');
+		}
+		return false;
 	};
 
 
@@ -138,6 +158,7 @@ var AkadokMaster = function() {
 			}
 		}
 	};
+
 
 	/**
 	 *  Scheduled task allowing to remove idle/closed servers automatically
@@ -213,17 +234,24 @@ var AkadokMaster = function() {
 			});
 			// Check if the server is created or updated
 			var serverKey = server.ip + ':' + server.port;
-			if (self.servers.hasOwnProperty(serverKey)) {
-				if (config.verbose)
-					winston.info('Received heartbeat from %s (%s)',
-						serverKey, server.name);
-				self.servers[serverKey] = server;
-			}
-			else {
-				winston.info('Server %s:%d (%s) joined server list',
-					server.ip, server.port, server.name);
-				self.servers[serverKey] = server;
-			}
+			var query = 'SELECT * FROM `online_servers` WHERE `ip` = \'' +
+				db.escape(server.ip) + '\' AND `port` = ' + db.escape(server.port);
+			db.query(query, function(err, rows) {
+				if (self.parseDbErrors(err))
+					return;
+				console.log(rows);
+			});
+			// if (self.servers.hasOwnProperty(serverKey)) {
+			// 	if (config.verbose)
+			// 		winston.info('Received heartbeat from %s (%s)',
+			// 			serverKey, server.name);
+			// 	self.servers[serverKey] = server;
+			// }
+			// else {
+			// 	winston.info('Server %s:%d (%s) joined server list',
+			// 		server.ip, server.port, server.name);
+			// 	self.servers[serverKey] = server;
+			// }
 			// Changes are saved
 			res.json(200, { success: true });
 		});
