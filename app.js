@@ -7,6 +7,7 @@ require('newrelic');
 var express = require('express');
 var mysql	= require('mysql');
 var winston = require('winston');
+// Initial config loading
 var config	= require('./config.json');
 
 /**
@@ -30,7 +31,7 @@ var AkadokMaster = function() {
 		self.ipaddress = '127.0.0.1';
 		self.port	   = 1518;
 		// Database config
-		self.db = null;
+		self.db		= null;
 		self.dbLost = false;
 	};
 
@@ -143,21 +144,18 @@ var AkadokMaster = function() {
 
 
 	/**
-	 *  Removes servers idle for more than 20 seconds
+	 *  Removes servers idle for more than X seconds
 	 */
 	self.removeIdleServers = function() {
 		var currentTimestamp = timestamp();
-		for (var currentServer in self.servers) {
-			if (!self.servers.hasOwnProperty(currentServer))
-				continue;
-			var server = self.servers[currentServer];
-			if (currentTimestamp - server.lastRefresh > config.max_idle_time) {
-				// Remove the server from servers object
-				delete self.servers[currentServer];
-				winston.info('Removed idle server %s (%s)',
-					currentServer, server.name);
-			}
-		}
+		var query = 'DELETE FROM online_servers WHERE last_refresh < ' +
+			(currentTimestamp - config.max_idle_time);
+		self.db.query(query, function(err, result) {
+			if (self.parseDbErrors(err) || result.affectedRows == 0)
+				return;
+			winston.info('Removed %d idle server%s.', result.affectedRows,
+				result.affectedRows > 1 ? 's' : '');
+		});
 	};
 
 
