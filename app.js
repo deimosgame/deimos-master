@@ -182,8 +182,8 @@ var AkadokMaster = function() {
 			var cacheFile = __dirname + '/' + config.cache_file;
 			// Check the cache file
 			var currentTimestampMillis = timestamp();
-			var cacheDate = currentTimestampMillis - (fs.statSync(cacheFile).mtime.getTime() / 1000);
-			if (!fs.existsSync(cacheFile) || cacheDate > config.cache_time) {
+			if (!fs.existsSync(cacheFile) || (currentTimestampMillis -
+				(fs.statSync(cacheFile).mtime.getTime() / 1000)) > config.cache_time) {
 				if (config.verbose)
 					winston.info('Request from %s for server list (renewed cache)', req.realIp());
 				// File generation from database
