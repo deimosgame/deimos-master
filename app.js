@@ -131,6 +131,7 @@ var AkadokMaster = function() {
 		if (err && (!self.dbLost || config.verbose)) {
 			self.dbLost = true;
 			winston.error('Lost connection to database!');
+			winston.error('Error details %s: %s', err.fatal ? '(fatal)' : '', err.code);
 		}
 		return false;
 	};
