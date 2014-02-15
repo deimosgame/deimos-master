@@ -126,14 +126,14 @@ var AkadokMaster = function() {
 				self.dbLost = false;
 				winston.info('Regained connexion to database!');
 			}
-			return true;
+			return false;
 		}
 		if (err && (!self.dbLost || config.verbose)) {
 			self.dbLost = true;
 			winston.error('Lost connection to database!');
 			winston.error('Error details %s: %s', err.fatal ? '(fatal)' : '', err.code);
 		}
-		return false;
+		return true;
 	};
 
 
@@ -235,25 +235,42 @@ var AkadokMaster = function() {
 			});
 			// Check if the server is created or updated
 			var serverKey = server.ip + ':' + server.port;
-			var query = 'SELECT * FROM `online_servers` WHERE `ip` = \'' +
-				self.db.escape(server.ip) + '\' AND `port` = ' +
+			var query = 'SELECT * FROM online_servers WHERE ip = ' +
+				self.db.escape(server.ip) + ' AND port = ' +
 				self.db.escape(server.port);
 			self.db.query(query, function(err, rows) {
 				if (self.parseDbErrors(err))
 					return;
-				console.log(rows);
+				if (rows.length > 0) {
+					// Server already exists
+					if (config.verbose)
+						winston.info('Received heartbeat from %s (%s)',
+							serverKey, server.name);
+					query = 'UPDATE online_servers SET ' +
+						'name = ' + self.db.escape(server.name) + ', ' +
+						'map = ' + self.db.escape(server.map) + ', ' +
+						'players = \'' + server.players.join(', ') + '\', ' +
+						'max_players = ' + self.db.escape(server.maxplayers) + ', ' +
+						'last_refresh = ' + server.lastRefresh + ' ' +
+						' WHERE id = ' + rows[0].id;
+				}
+				else {
+					// New server
+					winston.info('Server %s:%d (%s) joined server list',
+						server.ip, server.port, server.name);
+					query = 'INSERT INTO online_servers (ip, port, name, map, players, max_players, last_refresh) VALUES (\'' + 
+						server.ip + '\', ' +
+						self.db.escape(server.port) + ', ' +
+						self.db.escape(server.name) + ', ' +
+						self.db.escape(server.map) + ', \'' +
+						server.players.join(', ') + '\', ' +
+						self.db.escape(server.maxplayers) + ', ' +
+						server.lastRefresh + ')';					
+				}
+				self.db.query(query, function(err, result) {
+					self.parseDbErrors(err);
+				});
 			});
-			// if (self.servers.hasOwnProperty(serverKey)) {
-			// 	if (config.verbose)
-			// 		winston.info('Received heartbeat from %s (%s)',
-			// 			serverKey, server.name);
-			// 	self.servers[serverKey] = server;
-			// }
-			// else {
-			// 	winston.info('Server %s:%d (%s) joined server list',
-			// 		server.ip, server.port, server.name);
-			// 	self.servers[serverKey] = server;
-			// }
 			// Changes are saved
 			res.json(200, { success: true });
 		});
