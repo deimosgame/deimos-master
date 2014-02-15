@@ -1,9 +1,8 @@
 #!/bin/env node
 // New Relic agent
 require('newrelic');
-// Heapdump snapshots
-// require('heapdump');
 // Common dependencies
+var fs		= require('fs');
 var express = require('express');
 var mysql	= require('mysql');
 var winston = require('winston');
@@ -180,10 +179,33 @@ var AkadokMaster = function() {
 
 		// Main route to get server list
 		app.get('/', function(req, res) {
-			if (config.verbose)
-				winston.info('Request from %s for server list',
-					req.realIp());
-			res.json(200, self.servers);
+			var cacheFile = __dirname + '/' + config.cache_file;
+			// Check the cache file
+			var currentTimestampMillis = timestamp();
+			var cacheDate = currentTimestampMillis - (fs.statSync(cacheFile).mtime.getTime() / 1000);
+			if (!fs.existsSync(cacheFile) || cacheDate > config.cache_time) {
+				if (config.verbose)
+					winston.info('Request from %s for server list (renewed cache)', req.realIp());
+				// File generation from database
+				var query = 'SELECT * FROM online_servers';
+				self.db.query(query, function(err, result) {
+					if (self.parseDbErrors(err)) {
+						res.json(500, { result: 'error' });
+						return;
+					}
+					for (var i = 0; i < result.length; i++)
+						delete result[i].id;
+					fs.writeFile(cacheFile, JSON.stringify(result));
+					res.status(200).type('json').send(JSON.stringify(result));
+				});
+			}
+			else {
+				if (config.verbose)
+					winston.info('Request from %s for server list', req.realIp());
+				// Magical streaming from disk to res
+				res.status(200).type('json');
+				fs.createReadStream(cacheFile).pipe(res);
+			}
 		});
 
 		// Route used to get client's external IP

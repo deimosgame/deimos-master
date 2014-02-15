@@ -1,3 +1,4 @@
 node_modules
 server.log
+servers.lst
 newrelic_agent.log
