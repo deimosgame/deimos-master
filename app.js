@@ -211,7 +211,7 @@ var AkadokMaster = function() {
 				players: req.body.players,
 				maxplayers: parseInt(req.body.maxplayers),
 				lastRefresh: timestamp()
-			}
+			};
 			// Some validation to prevent errors
 			if (typeof server.port !== 'number' || !(server.port > 0)) {
 				res.json(400, { error: 'Bad request' });
@@ -235,8 +235,9 @@ var AkadokMaster = function() {
 			// Check if the server is created or updated
 			var serverKey = server.ip + ':' + server.port;
 			var query = 'SELECT * FROM `online_servers` WHERE `ip` = \'' +
-				db.escape(server.ip) + '\' AND `port` = ' + db.escape(server.port);
-			db.query(query, function(err, rows) {
+				self.db.escape(server.ip) + '\' AND `port` = ' +
+				self.db.escape(server.port);
+			self.db.query(query, function(err, rows) {
 				if (self.parseDbErrors(err))
 					return;
 				console.log(rows);
