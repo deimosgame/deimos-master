@@ -152,7 +152,7 @@ var AkadokMaster = function() {
 		self.db.query(query, function(err, result) {
 			if (self.parseDbErrors(err) || result.affectedRows == 0)
 				return;
-			winston.info('Removed %d idle server%s.', result.affectedRows,
+			winston.info('Removed %d idle server%s from the list', result.affectedRows,
 				result.affectedRows > 1 ? 's' : '');
 		});
 	};
