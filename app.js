@@ -1,4 +1,6 @@
 #!/bin/env node
+'use strict';
+
 // New Relic agent
 require('newrelic');
 // Common dependencies
