@@ -177,6 +177,13 @@ var AkadokMaster = function() {
 	 */
 	self.initializeServer = function() {
 		var app = express();
+		// Logger if needed
+		if (config.verbose)
+			app.use(express.logger());
+		// Compression middleware
+		app.use(express.compress({
+			level: 9
+		}));
 		app.use(express.json());
 
 		// Main route to get server list
@@ -187,7 +194,7 @@ var AkadokMaster = function() {
 			if (!fs.existsSync(cacheFile) || (currentTimestampMillis -
 				(fs.statSync(cacheFile).mtime.getTime() / 1000)) > config.cache_time) {
 				if (config.verbose)
-					winston.info('Request from %s for server list (renewed cache)', req.realIp());
+					winston.info('Renewed server list cache');
 				// File generation from database
 				var query = 'SELECT * FROM online_servers';
 				self.db.query(query, function(err, result) {
@@ -202,8 +209,6 @@ var AkadokMaster = function() {
 				});
 			}
 			else {
-				if (config.verbose)
-					winston.info('Request from %s for server list', req.realIp());
 				// Magical streaming from disk to res
 				res.status(200).type('json');
 				fs.createReadStream(cacheFile).pipe(res);
@@ -212,9 +217,6 @@ var AkadokMaster = function() {
 
 		// Route used to get client's external IP
 		app.get('/ip', function(req, res) {
-			if (config.verbose)
-				winston.info('Request for IP from %s',
-					req.realIp());
 			res.json(200, {
 				success: true,
 				ip: req.realIp()
@@ -348,7 +350,7 @@ var timestamp = function() {
 
 
 // Gets the real ip of a client, bypassing OpenShift proxies
-express.request.prototype.realIp = function() {
+express.request.__proto__.realIp = function() {
 	var headers = [
 		'X-Forwarded-For',
 		'Proxy-Client-IP',
