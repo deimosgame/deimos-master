@@ -21,7 +21,7 @@ var AkadokMaster = function() {
 
 
 	/*  ================================================================  */
-	/*  Helper functions for server initialization						  */
+	/*  Helper functions for server initialization                        */
 	/*  ================================================================  */
 
 	/**
@@ -30,7 +30,7 @@ var AkadokMaster = function() {
 	self.setupVariables = function() {
 		// Set the environment variables we need.
 		self.ipaddress = '127.0.0.1';
-		self.port	   = 1518;
+		self.port      = 1518;
 		// Database config
 		self.db		= null;
 		self.dbLost = false;
@@ -60,7 +60,7 @@ var AkadokMaster = function() {
 		// Process on exit and signals.
 		process.on('exit', function() { self.terminator(); });
 		['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-		 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGTERM'
+		'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGTERM'
 		].forEach(function(element, index, array) {
 			process.on(element, function() {
 				self.terminator(element);
@@ -90,8 +90,8 @@ var AkadokMaster = function() {
 	 */
 	self.connectDb = function() {
 		self.db = mysql.createConnection({
-			host	 : config.db.host,
-			user	 : config.db.user,
+			host     : config.db.host,
+			user     : config.db.user,
 			password : config.db.password,
 			database : config.db.database
 		});
@@ -152,7 +152,7 @@ var AkadokMaster = function() {
 		var query = 'DELETE FROM online_servers WHERE last_refresh < ' +
 			(currentTimestamp - config.max_idle_time);
 		self.db.query(query, function(err, result) {
-			if (self.parseDbErrors(err) || result.affectedRows == 0)
+			if (self.parseDbErrors(err) || result.affectedRows === 0)
 				return;
 			winston.info('Removed %d idle server%s from the list', result.affectedRows,
 				result.affectedRows > 1 ? 's' : '');
@@ -169,7 +169,7 @@ var AkadokMaster = function() {
 	};
 
 	/*  ================================================================  */
-	/*  App server functions											  */
+	/*  App server functions                                              */
 	/*  ================================================================  */
 
 	/**
@@ -236,7 +236,7 @@ var AkadokMaster = function() {
 				lastRefresh: timestamp()
 			};
 			// Some validation to prevent errors
-			if (typeof server.port !== 'number' || !(server.port > 0)) {
+			if (typeof server.port !== 'number' || server.port === 0) {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
@@ -246,7 +246,7 @@ var AkadokMaster = function() {
 				return;
 			}
 			if (typeof server.maxplayers !== 'number' ||
-				!(server.maxplayers > 0)) {
+				server.maxplayers === 0) {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
@@ -348,7 +348,7 @@ var timestamp = function() {
 
 
 // Gets the real ip of a client, bypassing OpenShift proxies
-express.request.__proto__.realIp = function() {
+express.request.prototype.realIp = function() {
 	var headers = [
 		'X-Forwarded-For',
 		'Proxy-Client-IP',
