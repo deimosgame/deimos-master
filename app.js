@@ -179,7 +179,7 @@ var AkadokMaster = function() {
 		var app = express();
 		// Logger if needed
 		if (config.verbose)
-			app.use(express.logger());
+			app.use(express.logger('dev'));
 		// Compression middleware
 		app.use(express.compress({
 			level: 9
