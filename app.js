@@ -29,11 +29,18 @@ var AkadokMaster = function() {
 	 */
 	self.setupVariables = function() {
 		// Set the environment variables we need.
-		self.ipaddress = '127.0.0.1';
-		self.port      = 1518;
+		self.ipaddress = '95.85.27.192';
+		self.port      = 80;
 		// Database config
 		self.db		= null;
 		self.dbLost = false;
+		// Cache, if needed
+		if (config.caching.type === 'memory') {
+			self.cache = '';
+			self.cacheAge = 0;
+		}
+		else
+			self.cacheFile = __dirname + '/servers.lst';
 	};
 
 
@@ -138,6 +145,69 @@ var AkadokMaster = function() {
 		return true;
 	};
 
+	/*	==================================================================	*/
+	/*	Cache management functions                                          */
+	/*	==================================================================	*/
+
+	/**
+	 *  Retreives the server list JSON from the cache
+	 *  @param  {express.ressource} res Ressource to send the cache to
+	 *  @return {Boolean} Wether or not the cache has been renewed
+	 */
+	self.retreiveList = function(res) {
+		if (self.getCacheAge() > config.caching.expiration) {
+			// Cache renewal
+			var newCache = '';
+			var query = 'SELECT * FROM online_servers';
+			self.db.query(query, function(err, result) {
+				if (self.parseDbErrors(err)) {
+					res.json(500, { result: 'error' });
+					return;
+				}
+				for (var i = 0; i < result.length; i++)
+					delete result[i].id;
+				self.updateCache(result);
+			});
+		}
+		// Just read from cache
+		res.status(200).type('json');
+		if (config.caching.type === 'memory')
+			res.send(self.cache);
+		else
+			fs.createReadStream(self.cacheFile).pipe(res);
+	};
+
+	/**
+	 *  Gets cache age
+	 *  @return {Number} Cache age, in seconds
+	 */
+	self.getCacheAge = function() {
+		var currentTimestamp = timestamp();
+		if (config.caching.type === 'memory')
+			return Math.floor(currentTimestamp - self.cacheAge);
+		else {
+			// Expiration if the file is removed
+			if (!fs.existsSync(self.cacheFile))
+				return config.caching.expiration;
+			var fileAge = fs.statSync(self.cacheFile).mtime.getTime() / 1000;
+			return Math.floor(currentTimestamp - fileAge);
+		}
+	};
+
+	/**
+	 *  Updates the server list cache
+	 *  @param  {Object} data JSON object to be stored
+	 *  @return {void}
+	 */
+	self.updateCache = function(data) {
+		var serializedData = JSON.stringify(data);
+		if (config.caching.type === 'memory') {
+			self.cache = serializedData;
+			self.cacheAge = timestamp();
+		}
+		else
+			fs.writeFile(self.cacheFile, serializedData);
+	};
 
 	/*	==================================================================	*/
 	/*	Helper functions													*/
@@ -186,33 +256,15 @@ var AkadokMaster = function() {
 		}));
 		app.use(express.json());
 
+		// Bitz.io route
+		app.get('/mu-510faaa6-7cf0aef9-6135aca0-37c832e5', function(req, res) {
+			res.send('42');
+		});
+
 		// Main route to get server list
 		app.get('/', function(req, res) {
-			var cacheFile = __dirname + '/' + config.cache_file;
-			// Check the cache file
-			var currentTimestampMillis = timestamp();
-			if (!fs.existsSync(cacheFile) || (currentTimestampMillis -
-				(fs.statSync(cacheFile).mtime.getTime() / 1000)) > config.cache_time) {
-				if (config.verbose)
-					winston.info('Renewed server list cache');
-				// File generation from database
-				var query = 'SELECT * FROM online_servers';
-				self.db.query(query, function(err, result) {
-					if (self.parseDbErrors(err)) {
-						res.json(500, { result: 'error' });
-						return;
-					}
-					for (var i = 0; i < result.length; i++)
-						delete result[i].id;
-					fs.writeFile(cacheFile, JSON.stringify(result));
-					res.status(200).type('json').send(JSON.stringify(result));
-				});
-			}
-			else {
-				// Magical streaming from disk to res
-				res.status(200).type('json');
-				fs.createReadStream(cacheFile).pipe(res);
-			}
+			if (self.retreiveList(res) && config.verbose)
+				winston.info('Renewed server list cache');
 		});
 
 		// Route used to get client's external IP

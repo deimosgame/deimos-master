@@ -4,8 +4,10 @@
 	"verbose": true,
 	"max_idle_time": 20,
 	"idle_check_frequency": 5,
-	"cache_file": "servers.lst",
-	"cache_time": 10,
+	"caching": {
+		"type": "memory",
+		"expiration": 10
+	},
 	"db": {
 		"host": "127.0.0.1",
 		"user": "root",
