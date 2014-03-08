@@ -29,7 +29,7 @@ var AkadokMaster = function() {
 	 */
 	self.setupVariables = function() {
 		// Set the environment variables we need.
-		self.ipaddress = '95.85.27.192';
+		self.ipaddress = '0.0.0.0';
 		self.port      = 1518;
 		// Database config
 		self.db		= null;
