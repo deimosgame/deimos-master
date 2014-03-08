@@ -258,11 +258,6 @@ var AkadokMaster = function() {
 		}));
 		app.use(express.json());
 
-		// Bitz.io route
-		app.get('/mu-510faaa6-7cf0aef9-6135aca0-37c832e5', function(req, res) {
-			res.send('42');
-		});
-
 		// Main route to get server list
 		app.get('/', function(req, res) {
 			if (self.retreiveList(res) && config.verbose)
