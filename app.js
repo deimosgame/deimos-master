@@ -155,9 +155,10 @@ var AkadokMaster = function() {
 	 *  @return {Boolean} Wether or not the cache has been renewed
 	 */
 	self.retreiveList = function(res) {
+		var updatedCache = false;
 		if (self.getCacheAge() > config.caching.expiration) {
+			updatedCache = true;
 			// Cache renewal
-			var newCache = '';
 			var query = 'SELECT * FROM online_servers';
 			self.db.query(query, function(err, result) {
 				if (self.parseDbErrors(err)) {
@@ -175,6 +176,7 @@ var AkadokMaster = function() {
 			res.send(self.cache);
 		else
 			fs.createReadStream(self.cacheFile).pipe(res);
+		return updatedCache;
 	};
 
 	/**
