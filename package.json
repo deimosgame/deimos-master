@@ -1,16 +1,16 @@
 {
-  "name": "akadok-master",
+  "name": "deimos-master",
   "version": "1.0.0",
-  "description": "Master server used to manage all Akadok instances",
+  "description": "Master server used to manage all deimos-server instances",
   "author": {
-    "name": "Louis-Paul - Artemis - Dareau",
+    "name": "Louis-Paul \"Artemis\" Dareau",
     "email": "dareau_l@epita.fr",
-    "url": "http://www.deimos-ga.me/"
+    "url": "https://deimos-ga.me"
   },
-  "homepage": "http://www.deimos-ga.me/",
+  "homepage": "https://deimos-ga.me",
   "repository": {
     "type": "git",
-    "url": "https://www.bitbucket.org/deimosgame/akadok-master"
+    "url": "https://github.com/deimosgame/deimos-master"
   },
   "engines": {
     "node": ">= 0.8.0",

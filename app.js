@@ -12,9 +12,9 @@ var winston = require('winston');
 var config	= require('./config.json');
 
 /**
- *  Main AkadokMaster class
+ *  Main DeimosMaster class
  */
-var AkadokMaster = function() {
+var DeimosMaster = function() {
 
 	// Scope
 	var self = this;
@@ -291,7 +291,7 @@ var AkadokMaster = function() {
 				res.json(400, { error: 'Bad request' });
 				return;
 			}
-			if (server.players !== '' && 
+			if (server.players !== '' &&
 				typeof server.players === 'undefined') {
 				res.json(400, { error: 'Bad request' });
 				return;
@@ -331,14 +331,14 @@ var AkadokMaster = function() {
 					// New server
 					winston.info('Server %s:%d (%s) joined server list',
 						server.ip, server.port, server.name);
-					query = 'INSERT INTO online_servers (ip, port, name, map, players, max_players, last_refresh) VALUES (\'' + 
+					query = 'INSERT INTO online_servers (ip, port, name, map, players, max_players, last_refresh) VALUES (\'' +
 						server.ip + '\', ' +
 						self.db.escape(server.port) + ', ' +
 						self.db.escape(server.name) + ', ' +
 						self.db.escape(server.map) + ', \'' +
 						server.players.join(', ') + '\', ' +
 						self.db.escape(server.maxplayers) + ', ' +
-						server.lastRefresh + ')';					
+						server.lastRefresh + ')';
 				}
 				self.db.query(query, function(err, result) {
 					self.parseDbErrors(err);
@@ -373,7 +373,7 @@ var AkadokMaster = function() {
 	self.start = function() {
 		//  Start the app on the specific interface (and port).
 		self.app.listen(self.port, self.ipaddress, function() {
-			winston.info('Akadok master server started on %s:%d.',
+			winston.info('Deimos master server started on %s:%d.',
 				self.ipaddress, self.port);
 		});
 	};
@@ -383,9 +383,9 @@ var AkadokMaster = function() {
 /**
  *  Server creation
  */
-var akadok = new AkadokMaster();
-akadok.initialize();
-akadok.start();
+var deimos = new DeimosMaster();
+deimos.initialize();
+deimos.start();
 
 
 /**
@@ -398,7 +398,7 @@ var timestamp = function() {
 };
 
 
-// Gets the real ip of a client, bypassing OpenShift proxies
+// Gets the real ip of a client through a reverse proxy
 express.request.__proto__.realIp = function() {
 	var headers = [
 		'X-Forwarded-For',

@@ -8,7 +8,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name : ['Akadok-master'],
+  app_name : ['Deimos-master'],
   /**
    * Your New Relic license key.
    */
